@@ -6,17 +6,21 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/yagobrt/go-pokedex/internal/pokecache"
 )
 
 type Client struct {
 	httpClient http.Client
+	pokecache.Cache
 }
 
-func NewClient(timeout time.Duration) Client {
+func NewClient(timeout, cacheDuration time.Duration) Client {
 	return Client{
 		httpClient: http.Client{
 			Timeout: timeout,
 		},
+		Cache: pokecache.NewCache(cacheDuration),
 	}
 }
 
@@ -36,7 +40,16 @@ func (c *Client) GetLocations(pageUrl *string) (LocationResponse, error) {
 		url = *pageUrl
 	}
 
-	// TODO: Usar el httpClient
+	// Read from cache if we already have it
+	if val, ok := c.Cache.Get(url); ok {
+		loc := LocationResponse{}
+		err := json.Unmarshal(val, &loc)
+		if err != nil {
+			return LocationResponse{}, err
+		}
+		return loc, nil
+	}
+
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -62,5 +75,6 @@ func (c *Client) GetLocations(pageUrl *string) (LocationResponse, error) {
 		return LocationResponse{}, err
 	}
 
+	c.Cache.Add(url, body)
 	return loc, nil
 }
