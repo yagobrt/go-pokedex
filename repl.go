@@ -5,7 +5,15 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/yagobrt/go-pokedex/internal/pokeapi"
 )
+
+type config struct {
+	pokeapiClient   pokeapi.Client
+	nextLocationURL *string
+	prevLocationURL *string
+}
 
 func cleanInput(text string) []string {
 	lower := strings.ToLower(text)
@@ -13,7 +21,7 @@ func cleanInput(text string) []string {
 	return words
 }
 
-func runREPL() {
+func runREPL(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -32,7 +40,7 @@ func runREPL() {
 			fmt.Println("Unknown command")
 			continue
 		}
-		err := cmd.callback()
+		err := cmd.callback(cfg)
 		if err != nil {
 			fmt.Println(err)
 		}
