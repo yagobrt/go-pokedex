@@ -6,12 +6,15 @@ import (
 	"os"
 )
 
+// cliCommand represents a command for the pokedex, with a name, a description
+// and a callback function
 type cliCommand struct {
 	name        string
 	description string
 	callback    func(cfg *config) error
 }
 
+// getCommands returns a map with all the availible commands
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {

@@ -49,6 +49,7 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 	return entry.val, true
 }
 
+// Removes old data from cache
 func (c *Cache) reapLoop() {
 	ticker := time.NewTicker(c.cleanInterval)
 

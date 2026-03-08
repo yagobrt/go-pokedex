@@ -15,6 +15,8 @@ type config struct {
 	prevLocationURL *string
 }
 
+// cleanInput recieves a string s and returns a slice with the substrings in s
+// in lowercase
 func cleanInput(text string) []string {
 	lower := strings.ToLower(text)
 	words := strings.Fields(lower)
