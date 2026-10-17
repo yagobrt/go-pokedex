@@ -5,7 +5,16 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/yagobrt/go-pokedex/internal/pokeapi"
 )
+
+type config struct {
+	commands      map[string]cliCommand
+	pokeapiClient pokeapi.Client
+	nextUrl       *string
+	prevUrl       *string
+}
 
 // Splits user input into words based on whitespace, trimming whitespace around
 // words and returning a list of lowercase words
@@ -16,7 +25,7 @@ func cleanInput(text string) []string {
 }
 
 // Run the REPL
-func runREPL() {
+func runREPL(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -31,9 +40,9 @@ func runREPL() {
 		}
 
 		commandName := input[0]
-		cmd, ok := getCommands()[commandName]
+		cmd, ok := cfg.commands[commandName]
 		if ok {
-			cmd.callback()
+			cmd.callback(cfg)
 		} else {
 			fmt.Println("Unknown command")
 		}

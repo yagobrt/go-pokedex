@@ -8,25 +8,57 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
 }
 
 // Exit the REPL
-func commandExit() error {
+func commandExit(cfg *config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
 // Get help on commands
-func commandHelp() error {
+func commandHelp(cfg *config) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println()
-	for _, cmd := range getCommands() {
+	for _, cmd := range cfg.commands {
 		fmt.Printf("%s: %s\n", cmd.name, cmd.description)
 	}
 	fmt.Println()
+	return nil
+}
+
+// Get the next 20 locations
+func commandMap(cfg *config) error {
+	res, err := cfg.pokeapiClient.GetLocations(cfg.nextUrl)
+	if err != nil {
+		return err
+	}
+
+	cfg.nextUrl = res.Next
+	cfg.prevUrl = res.Previous
+
+	for _, l := range res.Locations {
+		fmt.Println(l.Name)
+	}
+	return nil
+}
+
+// Get the previous 20 locations
+func commandMapb(cfg *config) error {
+	res, err := cfg.pokeapiClient.GetLocations(cfg.prevUrl)
+	if err != nil {
+		return err
+	}
+
+	cfg.nextUrl = res.Next
+	cfg.prevUrl = res.Previous
+
+	for _, l := range res.Locations {
+		fmt.Println(l.Name)
+	}
 	return nil
 }
 
@@ -42,6 +74,16 @@ func getCommands() map[string]cliCommand {
 			name:        "help",
 			description: "Displays a help message",
 			callback:    commandHelp,
+		},
+		"map": {
+			name:        "map",
+			description: "Display the names of 20 areas in the Pokemon world, each subsequent call will display the next 20 areas",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Display the names of the 20 previous areas",
+			callback:    commandMapb,
 		},
 	}
 }
