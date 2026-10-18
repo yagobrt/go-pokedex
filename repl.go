@@ -14,6 +14,7 @@ type config struct {
 	pokeapiClient pokeapi.Client
 	nextUrl       *string
 	prevUrl       *string
+	exploringArea *string
 }
 
 // Splits user input into words based on whitespace, trimming whitespace around
@@ -40,9 +41,21 @@ func runREPL(cfg *config) {
 		}
 
 		commandName := input[0]
+
+		if commandName == "explore" {
+			if len(input) < 2 {
+				fmt.Println("Please provide an area to explore.")
+				continue
+			}
+			cfg.exploringArea = &input[1]
+		}
 		cmd, ok := cfg.commands[commandName]
 		if ok {
-			cmd.callback(cfg)
+			err := cmd.callback(cfg)
+			if err != nil {
+				fmt.Println(err)
+			}
+			continue
 		} else {
 			fmt.Println("Unknown command")
 		}

@@ -62,6 +62,19 @@ func commandMapb(cfg *config) error {
 	return nil
 }
 
+// Get the pokemon in the area
+func commandExplore(cfg *config) error {
+	res, err := cfg.pokeapiClient.GetPokemon(*cfg.exploringArea)
+	if err != nil {
+		return err
+	}
+
+	for _, p := range res.PokemonEncounters {
+		fmt.Println(p.Pokemon.Name)
+	}
+	return nil
+}
+
 // Generate map of all availible commands
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
@@ -84,6 +97,11 @@ func getCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Display the names of the 20 previous areas",
 			callback:    commandMapb,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Display the names of the pokemon in one of the areas",
+			callback:    commandExplore,
 		},
 	}
 }
