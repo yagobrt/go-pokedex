@@ -47,7 +47,7 @@ func commandMap(cfg *config) error {
 }
 
 // Get the previous 20 locations
-func commandMapb(cfg *config) error {
+func commandMapB(cfg *config) error {
 	res, err := cfg.pokeapiClient.GetLocations(cfg.prevUrl)
 	if err != nil {
 		return err
@@ -78,15 +78,15 @@ func commandExplore(cfg *config) error {
 // Generate map of all availible commands
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
-		"exit": {
-			name:        "exit",
-			description: "Exit the Pokedex",
-			callback:    commandExit,
-		},
 		"help": {
 			name:        "help",
 			description: "Displays a help message",
 			callback:    commandHelp,
+		},
+		"exit": {
+			name:        "exit",
+			description: "Exit the Pokedex",
+			callback:    commandExit,
 		},
 		"map": {
 			name:        "map",
@@ -96,7 +96,7 @@ func getCommands() map[string]cliCommand {
 		"mapb": {
 			name:        "mapb",
 			description: "Display the names of the 20 previous areas",
-			callback:    commandMapb,
+			callback:    commandMapB,
 		},
 		"explore": {
 			name:        "explore",

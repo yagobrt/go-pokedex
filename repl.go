@@ -50,14 +50,13 @@ func runREPL(cfg *config) {
 			cfg.exploringArea = &input[1]
 		}
 		cmd, ok := cfg.commands[commandName]
-		if ok {
-			err := cmd.callback(cfg)
-			if err != nil {
-				fmt.Println(err)
-			}
-			continue
-		} else {
+		if !ok {
 			fmt.Println("Unknown command")
+			continue
+		}
+		err := cmd.callback(cfg)
+		if err != nil {
+			fmt.Println(err)
 		}
 	}
 }
