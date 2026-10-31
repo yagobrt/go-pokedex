@@ -42,19 +42,17 @@ func runREPL(cfg *config) {
 
 		commandName := input[0]
 
-		if commandName == "explore" {
-			if len(input) < 2 {
-				fmt.Println("Please provide an area to explore.")
-				continue
-			}
-			cfg.exploringArea = &input[1]
+		args := []string{}
+		if len(input) >= 2 {
+			args = input[1:]
 		}
+
 		cmd, ok := cfg.commands[commandName]
 		if !ok {
 			fmt.Println("Unknown command")
 			continue
 		}
-		err := cmd.callback(cfg)
+		err := cmd.callback(cfg, args...)
 		if err != nil {
 			fmt.Println(err)
 		}

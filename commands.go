@@ -8,18 +8,18 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, ...string) error
 }
 
 // Exit the REPL
-func commandExit(cfg *config) error {
+func commandExit(cfg *config, args ...string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
 // Get help on commands
-func commandHelp(cfg *config) error {
+func commandHelp(cfg *config, args ...string) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println()
@@ -31,7 +31,7 @@ func commandHelp(cfg *config) error {
 }
 
 // Get the next 20 locations
-func commandMap(cfg *config) error {
+func commandMap(cfg *config, args ...string) error {
 	res, err := cfg.pokeapiClient.GetLocations(cfg.nextUrl)
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func commandMap(cfg *config) error {
 }
 
 // Get the previous 20 locations
-func commandMapB(cfg *config) error {
+func commandMapB(cfg *config, args ...string) error {
 	res, err := cfg.pokeapiClient.GetLocations(cfg.prevUrl)
 	if err != nil {
 		return err
@@ -63,7 +63,13 @@ func commandMapB(cfg *config) error {
 }
 
 // Get the pokemon in the area
-func commandExplore(cfg *config) error {
+func commandExplore(cfg *config, args ...string) error {
+	if len(args) != 1 {
+		fmt.Println("Please provide an area to explore.")
+		return nil
+	}
+	cfg.exploringArea = &args[0]
+
 	res, err := cfg.pokeapiClient.GetPokemon(*cfg.exploringArea)
 	if err != nil {
 		return err
@@ -75,12 +81,21 @@ func commandExplore(cfg *config) error {
 	return nil
 }
 
+func commandCatch(cfg *config, args ...string) error {
+	if len(args) != 1 {
+		fmt.Println("Please provide a pokemon to catch.")
+		return nil
+	}
+	fmt.Printf("Throwing a Pokeball at %s...\n", args[0])
+	return nil
+}
+
 // Generate map of all availible commands
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {
 			name:        "help",
-			description: "Displays a help message",
+			description: "Displays this help message",
 			callback:    commandHelp,
 		},
 		"exit": {
@@ -102,6 +117,11 @@ func getCommands() map[string]cliCommand {
 			name:        "explore",
 			description: "Display the names of the pokemon in one of the areas",
 			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Attempt to catch a pokemon",
+			callback:    commandCatch,
 		},
 	}
 }
