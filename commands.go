@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"os"
@@ -109,6 +110,37 @@ func commandCatch(cfg *config, args ...string) error {
 	return nil
 }
 
+func commandInspect(cfg *config, args ...string) error {
+	if len(args) != 1 {
+		fmt.Println("Please provide a pokemon to show info.")
+		return nil
+	}
+	name := args[0]
+	pokemonInfo, ok := cfg.caughtPokemon[name]
+	if !ok {
+		return errors.New("You have not caught that pokemon.")
+	}
+
+	fmt.Printf("Name: %s\n", pokemonInfo.Name)
+	fmt.Printf("Height: %d\n", pokemonInfo.Height)
+	fmt.Printf("Weight: %d\n", pokemonInfo.Weight)
+	fmt.Println("Stats:")
+	for _, stat := range pokemonInfo.Stats {
+		fmt.Printf("\t- %s: %d\n", stat.Stat.Name, stat.BaseStat)
+	}
+
+	if len(pokemonInfo.Types) == 1 {
+		fmt.Println("Type:")
+		fmt.Printf("\t- %s\n", pokemonInfo.Types[0].Type.Name)
+	} else {
+		fmt.Println("Types:")
+		for _, t := range pokemonInfo.Types {
+			fmt.Printf("\t- %s\n", t.Type.Name)
+		}
+	}
+	return nil
+}
+
 // Generate map of all availible commands
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
@@ -141,6 +173,11 @@ func getCommands() map[string]cliCommand {
 			name:        "catch",
 			description: "Attempt to catch a pokemon",
 			callback:    commandCatch,
+		},
+		"inspect": {
+			name:        "inspect",
+			description: "Show details of any catched pokemon",
+			callback:    commandInspect,
 		},
 	}
 }
