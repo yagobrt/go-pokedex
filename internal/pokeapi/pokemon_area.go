@@ -15,7 +15,7 @@ type PokemonResponse struct {
 	} `json:"pokemon_encounters"`
 }
 
-func (c *Client) GetPokemon(area string) (PokemonResponse, error) {
+func (c *Client) GetPokemonInArea(area string) (PokemonResponse, error) {
 	url := BaseURL + "/location-area/" + area
 
 	// First check if the result is already in cache
@@ -25,7 +25,7 @@ func (c *Client) GetPokemon(area string) (PokemonResponse, error) {
 		if err != nil {
 			return PokemonResponse{}, err
 		}
-		return PokemonResponse{}, nil
+		return pokemon, nil
 	}
 
 	req, err := http.NewRequest("GET", url, nil)

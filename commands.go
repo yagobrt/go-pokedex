@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 )
 
@@ -70,7 +71,7 @@ func commandExplore(cfg *config, args ...string) error {
 	}
 	cfg.exploringArea = &args[0]
 
-	res, err := cfg.pokeapiClient.GetPokemon(*cfg.exploringArea)
+	res, err := cfg.pokeapiClient.GetPokemonInArea(*cfg.exploringArea)
 	if err != nil {
 		return err
 	}
@@ -86,7 +87,25 @@ func commandCatch(cfg *config, args ...string) error {
 		fmt.Println("Please provide a pokemon to catch.")
 		return nil
 	}
-	fmt.Printf("Throwing a Pokeball at %s...\n", args[0])
+	name := args[0]
+	pokemonInfo, err := cfg.pokeapiClient.GetPokemonInfo(name)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Throwing a Pokeball at %s...\n", name)
+
+	// Habría que hacer una segunda petición para obtener el ratio de captura
+	// de la especie desde pokemonInfo.Species.URL para hacerlo bien
+	chance := rand.Intn(pokemonInfo.BaseExperience)
+	if chance > 50 {
+		fmt.Printf("%s escaped!\n", name)
+		return nil
+	}
+
+	fmt.Printf("%s was caught!\n", name)
+
+	cfg.caughtPokemon[pokemonInfo.Name] = pokemonInfo
 	return nil
 }
 

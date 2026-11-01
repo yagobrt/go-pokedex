@@ -15,6 +15,7 @@ type config struct {
 	nextUrl       *string
 	prevUrl       *string
 	exploringArea *string
+	caughtPokemon map[string]pokeapi.Pokemon
 }
 
 // Splits user input into words based on whitespace, trimming whitespace around

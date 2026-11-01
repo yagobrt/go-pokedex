@@ -11,6 +11,7 @@ func main() {
 		commands:      getCommands(),
 		pokeapiClient: pokeapi.NewClient(5*time.Minute, 5*time.Second),
 		exploringArea: nil,
+		caughtPokemon: map[string]pokeapi.Pokemon{},
 	}
 	runREPL(cfg)
 }
